@@ -1,4 +1,5 @@
 const express = require('express')
+const controller = require("./controller/homecontrollers")
 
 const app = express()
 
@@ -10,84 +11,17 @@ const connectDB = require('./connectMongo')
 
 connectDB()
 
-const BookModel = require('./models/book.model')
+app.post('/createproduct', controller.createProducts)
 
-app.get('/api/v1/books', async (req, res) => {
+app.post('/productinvoice', controller.productinvoice)
 
-    return res.send(200)
-})
-
-app.get('/api/v1/books/:id', async (req, res) => {
-    try {
-        const data = await BookModel.findById(req.params.id)
-
-        if (data) {
-            return res.status(200).json({
-                msg: 'Ok',
-                data
-            })
-        }
-
-        return res.status(404).json({
-            msg: 'Not Found',
-        })
-    } catch (error) {
-        return res.status(500).json({
-            msg: error.message
-        })
-    }
-})
-
-app.post('/api/v1/books', async (req, res) => {
-    try {
-        const { name, author, price, description } = req.body
-        const book = new BookModel({
-            name, author, price, description
-        })
-        const data = await book.save()
-        return res.status(200).json({
-            msg: 'Ok',
-            data
-        })
-    } catch (error) {
-        return res.status(500).json({
-            msg: error.message
-        })
-    }
-})
-
-app.put('/api/v1/books/:id', async (req, res) => {
-    try {
-        const { name, author, price, description } = req.body
-        const { id } = req.params
-
-        const data = await BookModel.findByIdAndUpdate(id, {
-            name, author, price, description
-        }, { new: true })
-
-        return res.status(200).json({
-            msg: 'Ok',
-            data
-        })
-    } catch (error) {
-        return res.status(500).json({
-            msg: error.message
-        })
-    }
-})
-
-app.delete('/api/v1/books/:id', async (req, res) => {
-    try {
-        await BookModel.findByIdAndDelete(req.params.id)
-        return res.status(200).json({
-            msg: 'Ok',
-        })
-    } catch (error) {
-        return res.status(500).json({
-            msg: error.message
-        })
-    }
-})
+app.post('/verify_admin', controller.verifyAdmin)
+app.get('/getallproducts', controller.getAllProducts)
+app.delete('/deleteproduct', controller.deleteProduct)
+app.put('/updateproduct', controller.updateProduct)
+app.get('/getlastproductcode', controller.getLastProductCode);
+app.get('/getsampledata', controller.getSampleData);
+app.get('/getallinvoices', controller.getAllInvoices);
 
 const PORT = process.env.PORT
 
